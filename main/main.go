@@ -67,14 +67,13 @@ func main() {
 				MaxPayloadSize:           0,
 				MaxTopicSize:             0,
 				MaxSyncTokenSize:         0,
-				SyncResponseLimit:        1,
 			},
 		}, app.New()),
 		Node.New(&Config.NewNode{
 			NodeConfig: &Config.Node{
 				Name:            "nodeWebsocketHTTP",
 				RandomizerSeed:  Tools.GetSystemTime(),
-				ErrorLoggerPath: "error.log",
+				ErrorLoggerPath: LOGGER_PATH,
 			},
 			SystemgeConfig: &Config.Systemge{
 				HandleMessagesSequentially: false,
@@ -100,7 +99,6 @@ func main() {
 				MaxPayloadSize:           0,
 				MaxTopicSize:             0,
 				MaxSyncTokenSize:         0,
-				SyncResponseLimit:        1,
 			},
 			HttpConfig: &Config.HTTP{
 				ServerConfig: &Config.TcpServer{
