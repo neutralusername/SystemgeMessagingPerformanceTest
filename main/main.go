@@ -16,6 +16,7 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
+	Helpers.StartPprof()
 	Tools.NewLoggerQueue(LOGGER_PATH, 10000)
 	Dashboard.New(&Config.Dashboard{
 		NodeConfig: &Config.Node{
@@ -46,12 +47,14 @@ func main() {
 	},
 		Node.New(&Config.NewNode{
 			NodeConfig: &Config.Node{
-				Name:           "nodeApp",
-				RandomizerSeed: Tools.GetSystemTime(),
+				Name:            "nodeApp",
+				RandomizerSeed:  Tools.GetSystemTime(),
+				ErrorLoggerPath: LOGGER_PATH,
 			},
 			SystemgeConfig: &Config.Systemge{
-				HandleMessagesSequentially:  false,
-				ProcessMessagesSequentially: false,
+				ProcessMessagesOfEachConnectionSequentially: true,
+				ProcessAllMessagesSequentially:              true,
+				ProcessAllMessagesSequentiallyChannelSize:   30000,
 
 				SyncRequestTimeoutMs:            100000,
 				TcpTimeoutMs:                    5000,
@@ -77,8 +80,8 @@ func main() {
 				ErrorLoggerPath: LOGGER_PATH,
 			},
 			SystemgeConfig: &Config.Systemge{
-				HandleMessagesSequentially:  false,
-				ProcessMessagesSequentially: false,
+				ProcessMessagesOfEachConnectionSequentially: false,
+				ProcessAllMessagesSequentially:              false,
 
 				SyncRequestTimeoutMs:            100000,
 				TcpTimeoutMs:                    5000,

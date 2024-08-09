@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/neutralusername/Systemge/Helpers"
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/Node"
 )
@@ -15,7 +16,7 @@ func (app *AppWebsocketHTTP) GetWebsocketMessageHandlers() map[string]Node.Webso
 			startedAt := time.Now()
 			for i := 0; i < 100000; i++ {
 				func() {
-					err := node.AsyncMessage(topics.ASYNC, "", "nodeApp")
+					err := node.AsyncMessage(topics.ASYNC, Helpers.IntToString(i), "nodeApp")
 					if err != nil {
 						panic(err)
 					}
