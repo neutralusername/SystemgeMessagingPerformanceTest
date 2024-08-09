@@ -90,7 +90,7 @@ func main() {
 				},
 				EndpointConfigs: []*Config.TcpEndpoint{
 					{
-						Address: "localhost:60001",
+						Address: "[::1]:60001",
 						TlsCert: Helpers.GetFileContent("MyCertificate.crt"),
 						Domain:  "example.com",
 					},
