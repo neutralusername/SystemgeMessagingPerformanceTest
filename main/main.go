@@ -50,7 +50,8 @@ func main() {
 				RandomizerSeed: Tools.GetSystemTime(),
 			},
 			SystemgeConfig: &Config.Systemge{
-				HandleMessagesSequentially: false,
+				HandleMessagesSequentially:  false,
+				ProcessMessagesSequentially: false,
 
 				SyncRequestTimeoutMs:            100000,
 				TcpTimeoutMs:                    5000,
@@ -76,7 +77,8 @@ func main() {
 				ErrorLoggerPath: LOGGER_PATH,
 			},
 			SystemgeConfig: &Config.Systemge{
-				HandleMessagesSequentially: false,
+				HandleMessagesSequentially:  false,
+				ProcessMessagesSequentially: false,
 
 				SyncRequestTimeoutMs:            100000,
 				TcpTimeoutMs:                    5000,
