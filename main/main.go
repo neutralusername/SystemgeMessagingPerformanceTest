@@ -52,8 +52,8 @@ func main() {
 				ErrorLoggerPath: LOGGER_PATH,
 			},
 			SystemgeConfig: &Config.Systemge{
-				ProcessMessagesOfEachConnectionSequentially: true,
-				ProcessAllMessagesSequentially:              true,
+				ProcessMessagesOfEachConnectionSequentially: false,
+				ProcessAllMessagesSequentially:              false,
 				ProcessAllMessagesSequentiallyChannelSize:   30000,
 
 				SyncRequestTimeoutMs:            100000,

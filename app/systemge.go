@@ -42,7 +42,6 @@ func (app *App) GetAsyncMessageHandlers() map[string]Node.AsyncMessageHandler {
 				println("100000 async messages received in " + time.Since(sync_startedAt).String())
 				sync_counter.Store(0)
 			}
-			println(message.GetPayload())
 			return nil
 		},
 	}
