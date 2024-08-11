@@ -16,7 +16,6 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	Helpers.StartPprof()
 	Tools.NewLoggerQueue(LOGGER_PATH, 10000)
 	Dashboard.New(&Config.Dashboard{
 		NodeConfig: &Config.Node{

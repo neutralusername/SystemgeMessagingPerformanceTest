@@ -2,7 +2,7 @@ module SystemgeMessagingPerformanceTest
 
 go 1.22.3
 
-replace github.com/neutralusername/Systemge => ../Systemge
+//replace github.com/neutralusername/Systemge => ../Systemge
 
 require (
 	github.com/gorilla/websocket v1.5.3
