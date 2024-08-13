@@ -79,19 +79,6 @@ func main() {
 				MaxSyncTokenSize:         0,
 				MaxNodeNameSize:          0,
 			},
-			SystemgeClientConfig: &Config.SystemgeClient{
-				SyncRequestTimeoutMs:            10000,
-				TcpTimeoutMs:                    5000,
-				MaxConnectionAttempts:           0,
-				ConnectionAttemptDelayMs:        1000,
-				StopAfterOutgoingConnectionLoss: true,
-				TcpBufferBytes:                  1024 * 4,
-				IncomingMessageByteLimit:        0,
-				MaxPayloadSize:                  0,
-				MaxTopicSize:                    0,
-				MaxSyncTokenSize:                0,
-				MaxNodeNameSize:                 0,
-			},
 		}, app.New()),
 		Node.New(&Config.NewNode{
 			NodeConfig: &Config.Node{
