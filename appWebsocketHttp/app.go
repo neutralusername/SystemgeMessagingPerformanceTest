@@ -14,7 +14,6 @@ import (
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/Status"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
-	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/SystemgeServer"
 	"github.com/neutralusername/Systemge/WebsocketServer"
 )
@@ -33,9 +32,9 @@ type AppWebsocketHTTP struct {
 func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{}
 
-	messageHandler := SystemgeMessageHandler.NewConcurrentMessageHandler(
-		SystemgeMessageHandler.AsyncMessageHandlers{},
-		SystemgeMessageHandler.SyncMessageHandlers{},
+	messageHandler := SystemgeConnection.NewConcurrentMessageHandler(
+		SystemgeConnection.AsyncMessageHandlers{},
+		SystemgeConnection.SyncMessageHandlers{},
 		nil, nil,
 	)
 	app.systemgeServer = SystemgeServer.New(
@@ -72,7 +71,7 @@ func New() *AppWebsocketHTTP {
 				startedAt := time.Now()
 				for i := 0; i < 100000; i++ {
 					func() {
-						app.systemgeServer.AsyncMessage(topics.ASYNC, Helpers.IntToString(i))
+						app.connection.AsyncMessage(topics.ASYNC, Helpers.IntToString(i))
 					}()
 				}
 				println("100000 async messages sent in " + time.Since(startedAt).String())
@@ -83,7 +82,7 @@ func New() *AppWebsocketHTTP {
 				startedAt := time.Now()
 				for i := 0; i < 100000; i++ {
 					func() {
-						if responseChannel, err := app.systemgeServer.SyncRequest(topics.SYNC, ""); err != nil {
+						if responseChannel, err := app.connection.SyncRequest(topics.SYNC, ""); err != nil {
 							panic(err)
 						} else {
 							go func(responseChannel <-chan *Message.Message) {

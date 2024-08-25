@@ -11,7 +11,6 @@ import (
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/SystemgeClient"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
-	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 )
 
 var async_startedAt = time.Time{}
@@ -27,9 +26,9 @@ type App struct {
 func New() *App {
 	app := &App{}
 
-	messageHandler := SystemgeMessageHandler.NewConcurrentMessageHandler(
-		SystemgeMessageHandler.AsyncMessageHandlers{
-			topics.ASYNC: func(message *Message.Message) {
+	messageHandler := SystemgeConnection.NewConcurrentMessageHandler(
+		SystemgeConnection.AsyncMessageHandlers{
+			topics.ASYNC: func(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
 				val := sync_counter.Add(1)
 				if val == 1 {
 					sync_startedAt = time.Now()
@@ -40,8 +39,8 @@ func New() *App {
 				}
 			},
 		},
-		SystemgeMessageHandler.SyncMessageHandlers{
-			topics.SYNC: func(message *Message.Message) (string, error) {
+		SystemgeConnection.SyncMessageHandlers{
+			topics.SYNC: func(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
 				val := async_counter.Add(1)
 				if val == 1 {
 					async_startedAt = time.Now()
