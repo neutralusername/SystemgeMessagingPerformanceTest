@@ -4,7 +4,7 @@ go 1.23
 
 //replace github.com/neutralusername/Systemge => ../Systemge
 
-require github.com/neutralusername/Systemge v0.0.0-20240825163950-f53ac43cac8e
+require github.com/neutralusername/Systemge v0.0.0-20240826191952-4f670a5cb3a2
 
 require (
 	github.com/gorilla/websocket v1.5.3 // indirect
