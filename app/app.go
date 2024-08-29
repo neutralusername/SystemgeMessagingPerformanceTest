@@ -26,7 +26,7 @@ type App struct {
 func New() *App {
 	app := &App{}
 
-	messageHandler := SystemgeConnection.NewConcurrentMessageHandler(
+	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
 		SystemgeConnection.AsyncMessageHandlers{
 			topics.ASYNC: func(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
 				val := sync_counter.Add(1)
@@ -52,7 +52,7 @@ func New() *App {
 				return "", nil
 			},
 		},
-		nil, nil,
+		nil, nil, 100000,
 	)
 	app.systemgeClient = SystemgeClient.New(
 		&Config.SystemgeClient{
@@ -72,7 +72,7 @@ func New() *App {
 			connection.StopProcessingLoop()
 		},
 	)
-	Dashboard.NewClient(
+	if err := Dashboard.NewClient(
 		&Config.DashboardClient{
 			Name:             "appGameOfLife",
 			ConnectionConfig: &Config.SystemgeConnection{},
@@ -81,6 +81,8 @@ func New() *App {
 			},
 		},
 		app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus,
-		Commands.Handlers{})
+		Commands.Handlers{}).Start(); err != nil {
+		panic(err)
+	}
 	return app
 }

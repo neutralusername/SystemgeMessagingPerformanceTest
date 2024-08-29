@@ -12,7 +12,7 @@ import (
 const LOGGER_PATH = "logs.log"
 
 func main() {
-	Dashboard.NewServer(&Config.DashboardServer{
+	if err := Dashboard.NewServer(&Config.DashboardServer{
 		HTTPServerConfig: &Config.HTTPServer{
 			TcpListenerConfig: &Config.TcpListener{
 				Port: 8081,
@@ -38,7 +38,9 @@ func main() {
 		GoroutineUpdateIntervalMs: 1000,
 		StatusUpdateIntervalMs:    1000,
 		MetricsUpdateIntervalMs:   1000,
-	})
+	}).Start(); err != nil {
+		panic(err)
+	}
 	appWebsocketHttp.New()
 	app.New()
 	<-make(chan time.Time)

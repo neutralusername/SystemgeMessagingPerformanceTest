@@ -32,10 +32,10 @@ type AppWebsocketHTTP struct {
 func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{}
 
-	messageHandler := SystemgeConnection.NewConcurrentMessageHandler(
+	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
 		SystemgeConnection.AsyncMessageHandlers{},
 		SystemgeConnection.SyncMessageHandlers{},
-		nil, nil,
+		nil, nil, 100000,
 	)
 	app.systemgeServer = SystemgeServer.New(
 		&Config.SystemgeServer{
@@ -114,7 +114,7 @@ func New() *AppWebsocketHTTP {
 			"/": HTTPServer.SendDirectory("../frontend"),
 		},
 	)
-	Dashboard.NewClient(
+	if err := Dashboard.NewClient(
 		&Config.DashboardClient{
 			Name:             "appWebsocketHttp",
 			ConnectionConfig: &Config.SystemgeConnection{},
@@ -123,7 +123,9 @@ func New() *AppWebsocketHTTP {
 			},
 		}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus,
 		nil,
-	)
+	).Start(); err != nil {
+		panic(err)
+	}
 	return app
 }
 
