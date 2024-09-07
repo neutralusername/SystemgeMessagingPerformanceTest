@@ -28,7 +28,7 @@ func New() *App {
 
 	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
 		SystemgeConnection.AsyncMessageHandlers{
-			topics.ASYNC: func(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) {
+			topics.ASYNC: func(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
 				val := sync_counter.Add(1)
 				if val == 1 {
 					sync_startedAt = time.Now()
@@ -40,7 +40,7 @@ func New() *App {
 			},
 		},
 		SystemgeConnection.SyncMessageHandlers{
-			topics.SYNC: func(connection *SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
+			topics.SYNC: func(connection SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
 				val := async_counter.Add(1)
 				if val == 1 {
 					async_startedAt = time.Now()
@@ -54,29 +54,27 @@ func New() *App {
 		},
 		nil, nil, 100000,
 	)
-	app.systemgeClient = SystemgeClient.New(
+	app.systemgeClient = SystemgeClient.New("systemgeClient",
 		&Config.SystemgeClient{
-			Name: "systemgeClient",
-			EndpointConfigs: []*Config.TcpEndpoint{
+			ClientConfigs: []*Config.TcpClient{
 				{
 					Address: "localhost:60001",
 				},
 			},
-			ConnectionConfig: &Config.SystemgeConnection{},
+			ConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
-		func(connection *SystemgeConnection.SystemgeConnection) error {
+		func(connection SystemgeConnection.SystemgeConnection) error {
 			connection.StartProcessingLoopSequentially(messageHandler)
 			return nil
 		},
-		func(connection *SystemgeConnection.SystemgeConnection) {
+		func(connection SystemgeConnection.SystemgeConnection) {
 			connection.StopProcessingLoop()
 		},
 	)
-	if err := Dashboard.NewClient(
+	if err := Dashboard.NewClient("appGameOfLife",
 		&Config.DashboardClient{
-			Name:             "appGameOfLife",
-			ConnectionConfig: &Config.SystemgeConnection{},
-			EndpointConfig: &Config.TcpEndpoint{
+			ConnectionConfig: &Config.TcpSystemgeConnection{},
+			ClientConfig: &Config.TcpClient{
 				Address: "localhost:60000",
 			},
 		},
