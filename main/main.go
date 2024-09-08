@@ -40,6 +40,7 @@ func main() {
 			MetricsUpdateIntervalMs:   1000,
 			MaxChartEntries:           100,
 		},
+		nil, nil,
 	).Start(); err != nil {
 		panic(err)
 	}
