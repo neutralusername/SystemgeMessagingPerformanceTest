@@ -2,7 +2,7 @@ module SystemgeMessagingPerformanceTest
 
 go 1.23
 
-//replace github.com/neutralusername/Systemge => ../Systemge
+replace github.com/neutralusername/Systemge => ../Systemge
 
 require github.com/neutralusername/Systemge v0.0.0-20240909171217-aa55ba732e63
 

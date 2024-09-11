@@ -5,9 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/neutralusername/Systemge/Commands"
 	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/Dashboard"
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/SystemgeClient"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
@@ -33,8 +31,8 @@ func New() *App {
 				if val == 1 {
 					sync_startedAt = time.Now()
 				}
-				if val == 100000 {
-					println("100000 async messages received in " + time.Since(sync_startedAt).String())
+				if val == 1000000 {
+					println("1000000 async messages received in " + time.Since(sync_startedAt).String())
 					sync_counter.Store(0)
 				}
 			},
@@ -45,14 +43,14 @@ func New() *App {
 				if val == 1 {
 					async_startedAt = time.Now()
 				}
-				if val == 100000 {
-					println("100000 sync requests received in " + time.Since(async_startedAt).String())
+				if val == 1000000 {
+					println("1000000 sync requests received in " + time.Since(async_startedAt).String())
 					async_counter.Store(0)
 				}
 				return "", nil
 			},
 		},
-		nil, nil, 100000,
+		nil, nil, 1000000,
 	)
 	app.systemgeClient = SystemgeClient.New("systemgeClient",
 		&Config.SystemgeClient{
@@ -71,16 +69,8 @@ func New() *App {
 			connection.StopProcessingLoop()
 		},
 	)
-	if err := Dashboard.NewClient("appGameOfLife",
-		&Config.DashboardClient{
-			ConnectionConfig: &Config.TcpSystemgeConnection{},
-			ClientConfig: &Config.TcpClient{
-				Address: "localhost:60000",
-			},
-		},
-		app.systemgeClient.Start, app.systemgeClient.Stop, app.systemgeClient.GetMetrics, app.systemgeClient.GetStatus,
-		Commands.Handlers{}).Start(); err != nil {
-		panic(err)
+	if app.systemgeClient.Start() != nil {
+		panic("Failed to start systemgeClient")
 	}
 	return app
 }

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/neutralusername/Systemge/Config"
-	"github.com/neutralusername/Systemge/Dashboard"
 	"github.com/neutralusername/Systemge/Error"
 	"github.com/neutralusername/Systemge/HTTPServer"
 	"github.com/neutralusername/Systemge/Helpers"
@@ -69,18 +68,18 @@ func New() *AppWebsocketHTTP {
 		WebsocketServer.MessageHandlers{
 			topics.ASYNC: func(websocketClient *WebsocketServer.WebsocketClient, message *Message.Message) error {
 				startedAt := time.Now()
-				for i := 0; i < 100000; i++ {
+				for i := 0; i < 1000000; i++ {
 					func() {
 						app.connection.AsyncMessage(topics.ASYNC, Helpers.IntToString(i))
 					}()
 				}
-				println("100000 async messages sent in " + time.Since(startedAt).String())
+				println("1000000 async messages sent in " + time.Since(startedAt).String())
 				return nil
 			},
 			topics.SYNC: func(websocketClient *WebsocketServer.WebsocketClient, message *Message.Message) error {
 				counter := atomic.Uint32{}
 				startedAt := time.Now()
-				for i := 0; i < 100000; i++ {
+				for i := 0; i < 1000000; i++ {
 					func() {
 						if responseChannel, err := app.connection.SyncRequest(topics.SYNC, ""); err != nil {
 							panic(err)
@@ -91,14 +90,14 @@ func New() *AppWebsocketHTTP {
 									panic("response is nil")
 								}
 								counter.Add(1)
-								if counter.Load() == 100000 {
-									println("100000 sync responses received in " + time.Since(startedAt).String())
+								if counter.Load() == 1000000 {
+									println("1000000 sync responses received in " + time.Since(startedAt).String())
 								}
 							}(responseChannel)
 						}
 					}()
 				}
-				println("100000 sync requests sent in " + time.Since(startedAt).String())
+				println("1000000 sync requests sent in " + time.Since(startedAt).String())
 				return nil
 			},
 		},
@@ -115,25 +114,21 @@ func New() *AppWebsocketHTTP {
 			"/": HTTPServer.SendDirectory("../frontend"),
 		},
 	)
-	if err := Dashboard.NewClient("appWebsocketHttp",
-		&Config.DashboardClient{
-			ConnectionConfig: &Config.TcpSystemgeConnection{},
-			ClientConfig: &Config.TcpClient{
-				Address: "localhost:60000",
-			},
-		}, app.start, app.stop, app.systemgeServer.GetMetrics, app.getStatus,
-		nil,
-	).Start(); err != nil {
-		panic(err)
+	if app.Start() != nil {
+		panic("Failed to start app")
 	}
 	return app
 }
 
-func (app *AppWebsocketHTTP) getStatus() int {
+func (app *AppWebsocketHTTP) GetMetrics() map[string]uint64 {
+	return map[string]uint64{}
+}
+
+func (app *AppWebsocketHTTP) GetStatus() int {
 	return app.status
 }
 
-func (app *AppWebsocketHTTP) start() error {
+func (app *AppWebsocketHTTP) Start() error {
 	app.statusMutex.Lock()
 	defer app.statusMutex.Unlock()
 	if app.status != Status.STOPPED {
@@ -155,7 +150,7 @@ func (app *AppWebsocketHTTP) start() error {
 	return nil
 }
 
-func (app *AppWebsocketHTTP) stop() error {
+func (app *AppWebsocketHTTP) Stop() error {
 	app.statusMutex.Lock()
 	defer app.statusMutex.Unlock()
 	if app.status != Status.STARTED {
