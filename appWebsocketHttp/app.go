@@ -38,12 +38,12 @@ func New() *AppWebsocketHTTP {
 	)
 	app.systemgeServer = SystemgeServer.New("systemgeServer",
 		&Config.SystemgeServer{
-			ListenerConfig: &Config.TcpSystemgeListener{
+			TcpSystemgeListenerConfig: &Config.TcpSystemgeListener{
 				TcpServerConfig: &Config.TcpServer{
 					Port: 60001,
 				},
 			},
-			ConnectionConfig: &Config.TcpSystemgeConnection{},
+			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		nil, nil,
 		func(connection SystemgeConnection.SystemgeConnection) error {

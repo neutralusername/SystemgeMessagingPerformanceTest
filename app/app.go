@@ -54,12 +54,12 @@ func New() *App {
 	)
 	app.systemgeClient = SystemgeClient.New("systemgeClient",
 		&Config.SystemgeClient{
-			ClientConfigs: []*Config.TcpClient{
+			TcpClientConfigs: []*Config.TcpClient{
 				{
 					Address: "localhost:60001",
 				},
 			},
-			ConnectionConfig: &Config.TcpSystemgeConnection{},
+			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		func(connection SystemgeConnection.SystemgeConnection) error {
 			connection.StartProcessingLoopSequentially(messageHandler)
