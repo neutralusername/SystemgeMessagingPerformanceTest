@@ -13,7 +13,6 @@ import (
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/Status"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
-	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 	"github.com/neutralusername/Systemge/SystemgeServer"
 	"github.com/neutralusername/Systemge/WebsocketServer"
 )
@@ -21,8 +20,6 @@ import (
 type AppWebsocketHTTP struct {
 	status      int
 	statusMutex sync.Mutex
-
-	stopChannel chan<- bool
 
 	systemgeServer  *SystemgeServer.SystemgeServer
 	websocketServer *WebsocketServer.WebsocketServer
@@ -34,9 +31,9 @@ type AppWebsocketHTTP struct {
 func New() *AppWebsocketHTTP {
 	app := &AppWebsocketHTTP{}
 
-	messageHandler := SystemgeMessageHandler.NewTopicExclusiveMessageHandler(
-		SystemgeMessageHandler.AsyncMessageHandlers{},
-		SystemgeMessageHandler.SyncMessageHandlers{},
+	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
+		SystemgeConnection.AsyncMessageHandlers{},
+		SystemgeConnection.SyncMessageHandlers{},
 		nil, nil, 100000,
 	)
 	app.systemgeServer = SystemgeServer.New("systemgeServer",
@@ -50,13 +47,12 @@ func New() *AppWebsocketHTTP {
 		},
 		nil, nil,
 		func(connection SystemgeConnection.SystemgeConnection) error {
-			stopChannel, _ := SystemgeMessageHandler.StartMessageHandlingLoop_Sequentially(connection, messageHandler)
-			app.stopChannel = stopChannel
+			connection.StartMessageHandlingLoop_Sequentially(messageHandler)
 			app.connection = connection
 			return nil
 		},
 		func(connection SystemgeConnection.SystemgeConnection) {
-			close(app.stopChannel)
+			connection.StopMessageHandlingLoop()
 			app.connection = nil
 		},
 	)
