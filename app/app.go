@@ -9,6 +9,7 @@ import (
 	"github.com/neutralusername/Systemge/Message"
 	"github.com/neutralusername/Systemge/SystemgeClient"
 	"github.com/neutralusername/Systemge/SystemgeConnection"
+	"github.com/neutralusername/Systemge/SystemgeMessageHandler"
 )
 
 var async_startedAt = time.Time{}
@@ -19,13 +20,14 @@ var sync_counter = atomic.Uint32{}
 
 type App struct {
 	systemgeClient *SystemgeClient.SystemgeClient
+	stopChannel    chan<- bool
 }
 
 func New() *App {
 	app := &App{}
 
-	messageHandler := SystemgeConnection.NewTopicExclusiveMessageHandler(
-		SystemgeConnection.AsyncMessageHandlers{
+	messageHandler := SystemgeMessageHandler.NewTopicExclusiveMessageHandler(
+		SystemgeMessageHandler.AsyncMessageHandlers{
 			topics.ASYNC: func(connection SystemgeConnection.SystemgeConnection, message *Message.Message) {
 				val := sync_counter.Add(1)
 				if val == 1 {
@@ -37,7 +39,7 @@ func New() *App {
 				}
 			},
 		},
-		SystemgeConnection.SyncMessageHandlers{
+		SystemgeMessageHandler.SyncMessageHandlers{
 			topics.SYNC: func(connection SystemgeConnection.SystemgeConnection, message *Message.Message) (string, error) {
 				val := async_counter.Add(1)
 				if val == 1 {
@@ -62,11 +64,12 @@ func New() *App {
 			TcpSystemgeConnectionConfig: &Config.TcpSystemgeConnection{},
 		},
 		func(connection SystemgeConnection.SystemgeConnection) error {
-			connection.StartProcessingLoopSequentially(messageHandler)
+			stopChannel, _ := SystemgeMessageHandler.StartMessageHandlingLoop_Sequentially(connection, messageHandler)
+			app.stopChannel = stopChannel
 			return nil
 		},
 		func(connection SystemgeConnection.SystemgeConnection) {
-			connection.StopProcessingLoop()
+			close(app.stopChannel)
 		},
 	)
 	if app.systemgeClient.Start() != nil {
